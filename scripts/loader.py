@@ -7,11 +7,15 @@ import sys
 import os
 import json
 import logging
+import shutil
 import util
 
 class Loader():
     def __init__(self):
         self.config_path = "../config/config.json"
+        default_config_path = "../config/config-default.json"
+        if not os.path.isfile(self.config_path):
+            shutil.copy(default_config_path, self.config_path)
 
 
     def load(self):
