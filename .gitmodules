@@ -1,0 +1,4 @@
+[submodule "nmf-trainbenchmark/NMF"]
+	path = nmf-trainbenchmark/NMF
+	url = https://github.com/mlessmann/NMF.git
+	branch = execution-engine
