@@ -12,7 +12,7 @@ namespace TrainBenchmark
     public abstract class IncrementalRepairEngine<T> : RepairEngine<T>
     {
         protected INotifyEnumerable<T> graph;
-        private List<T> resultList;
+        private HashSet<T> results;
         private List<NotifyCollectionChangedEventArgs> eventArgs = new List<NotifyCollectionChangedEventArgs>();
 
         public IncrementalRepairEngine(QueryPattern<T> task) : base(task) { }
@@ -22,14 +22,14 @@ namespace TrainBenchmark
             this.graph = graph.AsNotifiable();
         }
 
-        public override List<T> Check()
+        public override ICollection<T> Check()
         {
-            resultList = graph.ToList();
+            results = new HashSet<T>(graph);
             graph.CollectionChanged += (obj, e) => eventArgs.Add(e);
-            return resultList;
+            return results;
         }
 
-        public override List<T> Recheck()
+        public override ICollection<T> Recheck()
         {
             foreach(var e in eventArgs)
             {
@@ -39,18 +39,18 @@ namespace TrainBenchmark
                 if (e.OldItems != null)
                 {
                     foreach (T item in e.OldItems)
-                        resultList.Remove(item);
+                        results.Remove(item);
                 }
 
                 if (e.NewItems != null)
                 {
                     foreach (T item in e.NewItems)
-                        resultList.Add(item);
+                        results.Add(item);
                 }
             }
 
             eventArgs.Clear();
-            return resultList;
+            return results;
         }
     }
 }

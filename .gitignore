@@ -41,3 +41,5 @@ config.json
 .Rproj.user
 nmf-trainbenchmark/.vs/
 nmf-trainbenchmark/packages/
+*.vspx
+*.user

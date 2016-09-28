@@ -47,12 +47,14 @@ def benchmark(conf):
         os.remove(result_file)
     shutil.copy(header, result_file)
     for change_set in conf.change_sets:
+        print("ChangeSet: " + change_set)
         for tool in conf.tools:
+            print("  Tool: " + tool)
             for query in conf.queries:
+                print("    Query: " + query)
                 for size in conf.sizes:
+                    print("      Size: " + str(size))
                     target = util.get_tool_jar(tool)
-                    print("Running benchmark: tool = " + tool + ", change set = " + change_set +
-                        ", query = " + query + ", size = " + str(size))
                     try:
                         output = subprocess.check_output(flatten(
                         ["java", conf.vmargs,
@@ -68,10 +70,11 @@ def benchmark(conf):
                         print("Timeout after ", conf.timeout, "s, continuing with next query.")
                         break
         for tool in ["Batch", "Immediate", "Transaction", "Parallel"]:
+            print("  Tool: NMF(" + tool + ")")
             for query in conf.queries:
+                print("    Query: " + query)
                 for size in conf.sizes:
-                    print("Running benchmark: tool = NMF(" + tool + "), change set = " + change_set +
-                          ", query = " + query + ", size = " + str(size))
+                    print("      Size: " + str(size));
                     try:
                         output = subprocess.check_output(flatten(
                         ["../nmf-trainbenchmark/TrainBenchmark/bin/Release/TrainBenchmark.exe",

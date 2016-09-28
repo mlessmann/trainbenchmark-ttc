@@ -71,13 +71,16 @@ namespace TrainBenchmark
             try
             {
                 ParseCommandLineArgs(args);
-                var fixedChangeSet = string.Equals(configuration.ChangeSet, "fixed", StringComparison.InvariantCultureIgnoreCase);
+                var meta = MetaRepository.Instance;
 
                 for (int run = 0; run < configuration.Runs; run++)
                 {
                     var rnd = new Random(0);
 
                     // Read
+#if !DEBUG
+                    GC.Collect();
+#endif
                     stopwatch.Start();
                     var model = LoadModel();
                     IRepairEngine engine = CreateRepairEngine();
@@ -87,6 +90,9 @@ namespace TrainBenchmark
                     Emit("read", engine.Name, run, 0, null);
 
                     // Check
+#if !DEBUG
+                    GC.Collect();
+#endif
                     stopwatch.Restart();
                     var actions = engine.Check();
                     stopwatch.Stop();
@@ -96,7 +102,7 @@ namespace TrainBenchmark
                     for (int iter = 0; iter < configuration.IterationCount; iter++)
                     {
                         var actionsSorted = actions.OrderBy(t => t.Item1).Select(t => t.Item2).ToList();
-                        int numberOfFixes = fixedChangeSet ? 10 : actionsSorted.Count / 10;
+                        int numberOfFixes = configuration.ChangeSet == ChangeSet.@fixed ? 10 : actionsSorted.Count / 10;
                         var fixes = new List<Action>(numberOfFixes);
                         for (int i = 0; i < numberOfFixes && i < actionsSorted.Count; i++)
                         {
@@ -106,6 +112,9 @@ namespace TrainBenchmark
                         }
 
                         // Repair
+#if !DEBUG
+                        GC.Collect();
+#endif
                         stopwatch.Restart();
                         engine.Repair(fixes);
                         stopwatch.Stop();
@@ -113,6 +122,9 @@ namespace TrainBenchmark
                         Emit("repair", engine.Name, run, iter, null);
 
                         // ReCheck
+#if !DEBUG
+                        GC.Collect();
+#endif
                         stopwatch.Restart();
                         actions = engine.Recheck();
                         stopwatch.Stop();
@@ -168,7 +180,7 @@ namespace TrainBenchmark
         {
             var repository = new ModelRepository();
             var train = repository.Resolve(new Uri(new FileInfo(configuration.Target).FullName));
-            return train.Model.RootElements[0] as RailwayContainer;
+            return (RailwayContainer)train.Model.RootElements[0];
         }
 
         private static void ParseCommandLineArgs(string[] args)
@@ -185,11 +197,11 @@ namespace TrainBenchmark
         {
             const string format = "{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}";
 
-            Console.Out.WriteLine(format, configuration.ChangeSet, runIdx, tool, configuration.Size, configuration.Query, phase, iteration, "time", stopwatch.ElapsedTicks * 1000000000 / Stopwatch.Frequency);
-            Console.Out.WriteLine(format, configuration.ChangeSet, runIdx, tool, configuration.Size, configuration.Query, phase, iteration, "memory", Environment.WorkingSet);
+            Console.WriteLine(format, configuration.ChangeSet, runIdx, tool, configuration.Size, configuration.Query, phase, iteration, "time", stopwatch.Elapsed.TotalMilliseconds * 1000000);
+            Console.WriteLine(format, configuration.ChangeSet, runIdx, tool, configuration.Size, configuration.Query, phase, iteration, "memory", Environment.WorkingSet);
             if (elements != null)
             {
-                Console.Out.WriteLine(format, configuration.ChangeSet, runIdx, tool, configuration.Size, configuration.Query, phase, iteration, "rss", elements.Value);
+                Console.WriteLine(format, configuration.ChangeSet, runIdx, tool, configuration.Size, configuration.Query, phase, iteration, "rss", elements.Value);
             }
         }
     }

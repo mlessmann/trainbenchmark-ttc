@@ -16,9 +16,9 @@ namespace TrainBenchmark
 
         public BatchRepairEngine(QueryPattern<T> task) : base(task) { }
 
-        public override List<T> Check()
+        public override ICollection<T> Check()
         {
-            return graph.AsEnumerable().ToList();
+            return graph.ToList();
         }
 
         protected override void Read(IEnumerableExpression<T> graph)
@@ -26,7 +26,7 @@ namespace TrainBenchmark
             this.graph = graph;
         }
 
-        public override List<T> Recheck()
+        public override ICollection<T> Recheck()
         {
             return Check();
         }

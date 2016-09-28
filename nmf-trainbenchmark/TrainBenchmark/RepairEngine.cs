@@ -39,9 +39,9 @@ namespace TrainBenchmark
 
         protected abstract void Read(IEnumerableExpression<T> graph);
 
-        public abstract List<T> Check();
+        public abstract ICollection<T> Check();
 
-        public abstract List<T> Recheck();
+        public abstract ICollection<T> Recheck();
 
         IEnumerable<Tuple<string, Action>> IRepairEngine.Check()
         {

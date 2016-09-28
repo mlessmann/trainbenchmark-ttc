@@ -18,8 +18,8 @@ namespace TrainBenchmark
         [Option('q', "query", Required = true, HelpText = "The query that should be evaluated")]
         public string Query { get; set; }
 
-        [Option('c', "changeSet", Required = true, HelpText = "A value indicating the change set (fixed or percentile)")]
-        public string ChangeSet { get; set; }
+        [Option('c', "changeSet", Required = true, HelpText = "A value indicating the change set (fixed or proportional)")]
+        public ChangeSet ChangeSet { get; set; }
 
         [Option('i', "iterationCount", Required = true, HelpText = "The number of iterations")]
         public int IterationCount { get; set; }
@@ -37,5 +37,11 @@ namespace TrainBenchmark
         Immediate,
         Transaction,
         Parallel
+    }
+
+    enum ChangeSet
+    {
+        @fixed,
+        proportional
     }
 }
