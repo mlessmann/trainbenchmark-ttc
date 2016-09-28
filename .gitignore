@@ -1,5 +1,6 @@
 plugin.xml_gen
 bin/
+obj/
 target/
 tmp/
 .settings/
@@ -38,3 +39,5 @@ hu.bme.mit.trainbenchmark.ttc.emf.model/hu.bme.mit.trainbenchmark.ttc.emf.model.
 hu.bme.mit.trainbenchmark.ttc.generator/hu.bme.mit.trainbenchmark.ttc.generator.iml
 config.json
 .Rproj.user
+nmf-trainbenchmark/.vs/
+nmf-trainbenchmark/packages/

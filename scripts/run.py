@@ -25,6 +25,8 @@ def build(skip_tests):
         subprocess.check_call("mvn clean install -DskipTests", shell=True)
     else:
         subprocess.check_call("mvn clean install", shell=True)
+    subprocess.check_call("msbuild nmf-trainbenchmark/NMFTrainbenchmark.sln /P:Configuration=Release", shell=True)	
+	
     util.set_working_directory()
 
 
@@ -65,41 +67,26 @@ def benchmark(conf):
                     except TimeoutExpired:
                         print("Timeout after ", conf.timeout, "s, continuing with next query.")
                         break
-        #for query in conf.queries:
-        #    for size in conf.sizes:
-        #        print("Running benchmark: tool = NMF (Incremental), change set = " + change_set +
-        #              ", query = " + query + ", size = " + str(size))
-        #        try:
-        #            output = subprocess.check_output(flatten(
-        #            ["mono", "../solution/TrainBenchmarkMono.exe",
-        #             "../models/railway-{0}.railway".format(size),
-        #             "--runs", str(conf.runs),
-        #             "--size", str(size),
-        #             "--query", query,
-        #             "--changeSet", change_set,
-        #             "--iterationCount", str(conf.iterations)]), timeout=conf.timeout)
-        #            with open(result_file, "ab") as file:
-        #                file.write(output)
-        #        except TimeoutExpired:
-        #            print("Timeout after ", conf.timeout, "s, continuing with next query.")
-        #            break
-        #        print("Running benchmark: tool = NMF (Batch), change set = " + change_set +
-        #              ", query = " + query + ", size = " + str(size))
-        #        try:
-        #            output = subprocess.check_output(flatten(
-        #            ["mono", "../solution/TrainBenchmarkMono.exe",
-        #             "../models/railway-{0}.railway".format(size),
-        #             "--runs", str(conf.runs),
-        #             "--batch",
-        #             "--size", str(size),
-        #             "--query", query,
-        #             "--changeSet", change_set,
-        #             "--iterationCount", str(conf.iterations)]), timeout=conf.timeout)
-        #            with open(result_file, "ab") as file:
-        #                file.write(output)
-        #        except TimeoutExpired:
-        #            print("Timeout after ", conf.timeout, "s, continuing with next query.")
-        #            break
+        for tool in ["Batch", "Immediate", "Transaction", "Parallel"]:
+            for query in conf.queries:
+                for size in conf.sizes:
+                    print("Running benchmark: tool = NMF(" + tool + "), change set = " + change_set +
+                          ", query = " + query + ", size = " + str(size))
+                    try:
+                        output = subprocess.check_output(flatten(
+                        ["../nmf-trainbenchmark/TrainBenchmark/bin/Release/TrainBenchmark.exe",
+                         "../models/railway-{0}.xmi".format(size),
+                         "--runs", str(conf.runs),
+                         "--size", str(size),
+                         "--query", query,
+                         "--changeSet", change_set,
+                         "--iterationCount", str(conf.iterations),
+						 "--executionType", tool]), timeout=conf.timeout)
+                        with open(result_file, "ab") as file:
+                            file.write(output)
+                    except TimeoutExpired:
+                        print("Timeout after ", conf.timeout, "s, continuing with next query.")
+                        break
 
 def clean_dir(dir):
     if os.path.exists(dir):
