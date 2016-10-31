@@ -64,10 +64,10 @@ savePlot <-function(results, settings, phases, fileName){
                                       labels = seq(minValue, maxValue, by=round(maxValue/5,0)))
   }
   else if (settings@yAxis == "Log10"){
-    plot <- plot + scale_y_log10(breaks = round(10^seq(log10(minValue), log10(maxValue), by=((log10(maxValue)-log10(minValue))/7)),7), 
-                                labels = round(10^seq(log10(minValue), log10(maxValue), by=((log10(maxValue)-log10(minValue))/7)),2))
+    plot <- plot + scale_y_log10(breaks = 10^seq(round(log10(minValue)), round(log10(maxValue)), by=1), 
+                                labels = 10^seq(round(log10(minValue)), round(log10(maxValue)), by=1))
   }
-  ggsave(plot,filename = fileName, width=14, height=7, dpi=192)
+  ggsave(plot,filename = fileName, width=7, height=4, dpi=192)
   print(fileName)
 
 
