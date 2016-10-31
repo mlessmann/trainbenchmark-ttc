@@ -5,8 +5,8 @@
       "Iteration": false
     },
     "Groups": {
-      "Query": true,
-      "Tool": false
+      "Query": false,
+      "Tool": true
     }
   },
   "Summarize_Functions": [

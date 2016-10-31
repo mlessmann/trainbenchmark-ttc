@@ -101,15 +101,7 @@ namespace TrainBenchmark
 
                     for (int iter = 0; iter < configuration.IterationCount; iter++)
                     {
-                        var actionsSorted = actions.OrderBy(t => t.Item1).Select(t => t.Item2).ToList();
-                        int numberOfFixes = configuration.ChangeSet == ChangeSet.@fixed ? 10 : actionsSorted.Count / 10;
-                        var fixes = new List<Action>(numberOfFixes);
-                        for (int i = 0; i < numberOfFixes && i < actionsSorted.Count; i++)
-                        {
-                            int index = rnd.NextInt(actionsSorted.Count);
-                            fixes.Add(actionsSorted[index]);
-                            actionsSorted.RemoveAt(index);
-                        }
+                        var fixes = FilterFixes(rnd, actions);
 
                         // Repair
 #if !DEBUG
@@ -138,6 +130,21 @@ namespace TrainBenchmark
                 Console.Error.WriteLine(ex.ToString());
                 Environment.ExitCode = 1;
             }
+        }
+
+        private static List<Action> FilterFixes(Random rnd, IEnumerable<Tuple<string, Action>> actions)
+        {
+            var actionsSorted = actions.OrderBy(t => t.Item1).Select(t => t.Item2).ToList();
+            int numberOfFixes = configuration.ChangeSet == ChangeSet.@fixed ? 10 : actionsSorted.Count / 10;
+            var fixes = new List<Action>(numberOfFixes);
+            for (int i = 0; i < numberOfFixes && i < actionsSorted.Count; i++)
+            {
+                int index = rnd.NextInt(actionsSorted.Count);
+                fixes.Add(actionsSorted[index]);
+                actionsSorted.RemoveAt(index);
+            }
+
+            return fixes;
         }
 
         private static IRepairEngine CreateRepairEngine()
