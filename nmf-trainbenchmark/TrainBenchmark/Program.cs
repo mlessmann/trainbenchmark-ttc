@@ -34,16 +34,20 @@ namespace TrainBenchmark
             rc => from route1 in rc.Routes.Concat(rc.Invalids.OfType<Route>())
                   from route2 in rc.Routes.Concat(rc.Invalids.OfType<Route>())
                   where route1 != route2 && route2.Entry != route1.Exit
-                  from sensor1 in route1.DefinedBy
-                  from te1 in sensor1.Elements
-                  from te2 in te1.ConnectsTo
-                  where te2.Sensor == null || route2.DefinedBy.Contains<ISensor>(te2.Sensor)
+                  where semaphoreNeighborCheck(route1, route2)
                   select new Tuple<IRoute, IRoute>(route2, route1),
             match => match.Item1.Entry = match.Item2.Exit,
             match => string.Format("<semaphore : {0:0000}, route1 : {1:0000}, route2 : {2:0000}>",
                      match.Item2.Exit.Id.GetValueOrDefault(),
                      match.Item2.Id.GetValueOrDefault(),
                      match.Item1.Id.GetValueOrDefault()));
+
+        private static Func<IRoute, IRoute, bool> semaphoreNeighborCheck =
+            (route1, route2) => (from sensor1 in route1.DefinedBy
+                                 from te1 in sensor1.Elements
+                                 from te2 in te1.ConnectsTo
+                                 where te2.Sensor == null || route2.DefinedBy.Contains(te2.Sensor)
+                                 select 0).Any();
 
         private static QueryPattern<ISwitch> switchSensor = new QueryPattern<ISwitch>(
             rc => rc.Descendants().OfType<ISwitch>().Where(sw => sw.Sensor == null),
