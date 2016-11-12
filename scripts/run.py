@@ -4,6 +4,7 @@
 
 """
 import argparse
+import datetime
 import logger
 import logging
 import os
@@ -152,6 +153,8 @@ if __name__ == "__main__":
     loader = Loader()
     config = loader.load()
 
+    start = datetime.datetime.now()
+
     if args.build:
         build(args.skip_tests)
     if args.generate:
@@ -172,3 +175,7 @@ if __name__ == "__main__":
         test()
         visualize()
         extract_results()
+	
+    end = datetime.datetime.now()
+    delta = end - start
+    print("Done in ", str(delta))
