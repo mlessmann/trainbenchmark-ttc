@@ -20,5 +20,5 @@
       ]
     }
   ],
-  "Extension": ["png"]
+  "Extension": ["png", "svg"]
 }
