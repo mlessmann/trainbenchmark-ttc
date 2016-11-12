@@ -8,7 +8,7 @@ source("constants.R")
 args <- commandArgs(trailingOnly = TRUE)
 configPath <- args[1]
 
-results <-read.csv(resultsPath, header=TRUE, sep='\t')
+results <-subset(read.csv(resultsPath, header=TRUE, sep='\t'), Iteration > 0)
 
 config <- fromJSON(configPath)
 
@@ -47,6 +47,7 @@ for(row in 1:nrow(config$Summarize_Functions)){
             fileName <- paste(rootPath, scenario, "-", tool, "-GroupBy-Query-", metric, "-", name, ".",  extension, sep='')
             savePlot(subData2, settings, phases, fileName)
           }
+          write.csv(subData2, file = paste(rootPath, scenario, "-", tool, "-GroupBy-Query-", metric, "-", name, ".csv", sep=''))
         }
         
         if (config$Dimensions$X_Dimensions$Iteration){
@@ -63,6 +64,7 @@ for(row in 1:nrow(config$Summarize_Functions)){
               fileName <- paste(rootPath, scenario, "-", tool, "-Size-", size, "-GroupBy-Query-", metric, "-", name, ".", extension, sep='')
               savePlot(subData3, settings, phases, fileName)
             }
+            write.csv(subData3, file = paste(rootPath, scenario, "-", tool, "-Size-", size, "-GroupBy-Query-", metric, "-", name, ".csv", sep=''))
           }
         } 
       }
@@ -84,6 +86,7 @@ for(row in 1:nrow(config$Summarize_Functions)){
             fileName <- paste(rootPath, scenario, "-", query, "-GroupBy-Tool-",metric, "-", name, ".", extension, sep='')
             savePlot(subData2, settings, phases, fileName)
           }
+          write.csv(ddply(subData2, c("Tool", "Size"), summarise, N=length(MetricValue), mean=mean(MetricValue), sd=sd(MetricValue)), file = paste(rootPath, scenario, "-", query, "-GroupBy-Tool-",metric, "-", name, ".csv", sep=''))
         }
         
         if (config$Dimensions$X_Dimensions$Iteration){
@@ -99,6 +102,7 @@ for(row in 1:nrow(config$Summarize_Functions)){
               settings <- setTitle(settings, title)
               savePlot(subData3, settings, phases, fileName)
             }
+            write.csv(subData3, file = paste(rootPath, scenario, "-", query, "-Size-", size, "-GroupBy-Tool-", metric, "-", name, ".csv", sep=''))
           }
         }     
       }
